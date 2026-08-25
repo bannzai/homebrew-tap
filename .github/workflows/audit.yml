@@ -1,0 +1,30 @@
+name: audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      # audit は tap 済みの cask を対象にするため、checkout をそのまま tap として登録する
+      # (リモートを tap すると PR の変更ではなく main の内容を検査してしまう)
+      - name: Tap this repository
+        run: |
+          tap_dir="$(brew --repository)/Library/Taps/bannzai/homebrew-tap"
+          mkdir -p "$(dirname "$tap_dir")"
+          ln -s "$GITHUB_WORKSPACE" "$tap_dir"
+          # Homebrew 6.0 はサードパーティ tap のコードを評価する前に trust を要求する
+          # (https://docs.brew.sh/Tap-Trust)
+          brew trust bannzai/tap
+
+      - name: Audit casks
+        run: brew audit --cask bannzai/tap/puts
