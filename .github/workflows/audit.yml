@@ -12,19 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # checkout を tap として登録し trust するところまでこのアクションが行う。
+      # master 参照は「同期を止めてエラーにする」と警告されるためコミットで固定する
       - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
-      # audit は tap 済みの cask を対象にするため、checkout をそのまま tap として登録する
-      # (リモートを tap すると PR の変更ではなく main の内容を検査してしまう)
-      - name: Tap this repository
-        run: |
-          tap_dir="$(brew --repository)/Library/Taps/bannzai/homebrew-tap"
-          mkdir -p "$(dirname "$tap_dir")"
-          ln -s "$GITHUB_WORKSPACE" "$tap_dir"
-          # Homebrew 6.0 はサードパーティ tap のコードを評価する前に trust を要求する
-          # (https://docs.brew.sh/Tap-Trust)
-          brew trust bannzai/tap
+        uses: Homebrew/actions/setup-homebrew@1f8e202ffddf94def7f42f6fa3a482e821489f9c # 2026.07.10.1
 
       - name: Audit casks
         run: brew audit --cask bannzai/tap/puts
