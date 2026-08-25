@@ -10,7 +10,7 @@ jobs:
   audit:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # checkout を tap として登録し trust するところまでこのアクションが行う。
       # master 参照は「同期を止めてエラーにする」と警告されるためコミットで固定する
