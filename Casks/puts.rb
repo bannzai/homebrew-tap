@@ -7,9 +7,18 @@ cask "puts" do
   desc "Turn screenshots into URLs AI agents can read"
   homepage "https://bannzai.github.io/PUTS/"
 
-  depends_on macos: ">= :tahoe"
+  # PUTS.app の MACOSX_DEPLOYMENT_TARGET (26.0 = Tahoe) に合わせた最小バージョン
+  depends_on macos: :tahoe
 
   app "PUTS.app"
-  # 同梱 CLI (ADR 0019: app と同じ署名で app の Keychain・履歴を読むため、formula 単体配布ではなく同梱バイナリへの symlink で配る)
+  # CLI は app 同梱の署名済みバイナリを symlink する。単体配布のバイナリは app の Keychain・履歴を読めないため
+  # (ADR 0019: https://github.com/bannzai/PUTS/blob/main/documents/adr/0019-embed-cli-in-app-bundle-for-keychain-and-history.md)
   binary "#{appdir}/PUTS.app/Contents/Helpers/puts.app/Contents/MacOS/puts"
+
+  zap trash: [
+    "~/.config/puts",
+    "~/.local/share/puts",
+    "~/Library/Application Scripts/com.bannzai.PUTS",
+    "~/Library/Containers/com.bannzai.PUTS",
+  ]
 end
